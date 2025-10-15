@@ -1,0 +1,29 @@
+# Web Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# WebSocket
+websockets>=12.0
+
+# Data Structures
+sortedcontainers>=2.4.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-benchmark>=4.0.0
+
+# Development
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Performance Profiling
+py-spy>=0.3.14
+memory-profiler>=0.61.0
+
+# Utilities
+python-dotenv>=1.0.0
+structlog>=23.1.0

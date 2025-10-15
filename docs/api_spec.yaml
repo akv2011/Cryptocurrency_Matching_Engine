@@ -1,0 +1,607 @@
+openapi: 3.0.3
+info:
+  title: Cryptocurrency Matching Engine API
+  description: |
+    High-performance cryptocurrency matching engine implementing REG NMS-inspired principles.
+    
+    **Performance:**
+    - Throughput: 6,641 orders/second
+    - Latency: 0.406 ms (p99)
+    - BBO Updates: 6.7 μs (p99)
+    
+    **Supported Order Types:**
+    - Market: Immediate execution at best available price(s)
+    - Limit: Execute at specified price or better, rest on book
+    - IOC (Immediate-Or-Cancel): Execute immediately, cancel unfilled
+    - FOK (Fill-Or-Kill): Execute entire order or reject (all-or-nothing)
+    
+    **Matching Principles:**
+    - Price-Time Priority: Higher bids and lower offers prioritized, FIFO at each price
+    - Trade-Through Prevention: No execution at worse prices when better prices available
+    - Partial Fills: Better prices filled first
+    
+  version: 1.0.0
+  contact:
+    name: GoQuant Assignment
+    email: careers@goquant.io
+  license:
+    name: Private (Confidential Assignment)
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+  - url: http://localhost:8080
+    description: Base URL (for health check)
+
+tags:
+  - name: Health
+    description: System health and status endpoints
+  - name: Orders
+    description: Order submission and management
+  - name: Market Data
+    description: Order book and BBO queries
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check if the API server is running and responsive
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-01-24T12:34:56.789Z"
+              examples:
+                success:
+                  summary: Healthy response
+                  value:
+                    status: "healthy"
+                    timestamp: "2025-01-24T12:34:56.789Z"
+
+  /api/v1/orders:
+    post:
+      tags:
+        - Orders
+      summary: Submit an order
+      description: |
+        Submit a new order to the matching engine. The order will be validated, 
+        matched against the order book if possible, and added to the book if unfilled quantity remains.
+        
+        **Order Types:**
+        - `market`: Executes immediately at best available prices
+        - `limit`: Executes at limit price or better, rests on book if not filled
+        - `ioc`: Executes immediately, cancels unfilled portion
+        - `fok`: Executes entire order or rejects (all-or-nothing)
+        
+        **Price Requirements:**
+        - `limit`: Required
+        - `market`, `ioc`, `fok`: Optional (market orders ignore price)
+        
+      operationId: submitOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+            examples:
+              limitBuy:
+                summary: Limit Buy Order
+                value:
+                  symbol: "BTC-USDT"
+                  order_type: "limit"
+                  side: "buy"
+                  quantity: "0.5"
+                  price: "50000.00"
+              limitSell:
+                summary: Limit Sell Order
+                value:
+                  symbol: "BTC-USDT"
+                  order_type: "limit"
+                  side: "sell"
+                  quantity: "1.0"
+                  price: "51000.00"
+              marketBuy:
+                summary: Market Buy Order
+                value:
+                  symbol: "BTC-USDT"
+                  order_type: "market"
+                  side: "buy"
+                  quantity: "0.25"
+              iocSell:
+                summary: IOC Sell Order
+                value:
+                  symbol: "BTC-USDT"
+                  order_type: "ioc"
+                  side: "sell"
+                  quantity: "0.75"
+                  price: "50500.00"
+              fokBuy:
+                summary: FOK Buy Order
+                value:
+                  symbol: "BTC-USDT"
+                  order_type: "fok"
+                  side: "buy"
+                  quantity: "2.0"
+                  price: "50000.00"
+      responses:
+        '200':
+          description: Order accepted and processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+              examples:
+                filled:
+                  summary: Order Fully Filled
+                  value:
+                    order_id: "550e8400-e29b-41d4-a716-446655440000"
+                    status: "filled"
+                    filled_quantity: "0.5"
+                    remaining_quantity: "0.0"
+                    average_price: "50000.00"
+                    timestamp: "2025-01-24T12:34:56.789123Z"
+                    trades:
+                      - trade_id: "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+                        price: "50000.00"
+                        quantity: "0.5"
+                        aggressor_side: "buy"
+                partiallyFilled:
+                  summary: Order Partially Filled
+                  value:
+                    order_id: "660f9511-f3ac-52e5-b827-557766551111"
+                    status: "partially_filled"
+                    filled_quantity: "0.3"
+                    remaining_quantity: "0.2"
+                    average_price: "50000.00"
+                    timestamp: "2025-01-24T12:34:56.789123Z"
+                    trades:
+                      - trade_id: "8d0f7780-8536-51f6-c938-f18fd2g01bf8"
+                        price: "50000.00"
+                        quantity: "0.3"
+                        aggressor_side: "buy"
+                accepted:
+                  summary: Order Accepted (Resting on Book)
+                  value:
+                    order_id: "770g0622-g4bd-63g6-d049-g29ge3h12cg9"
+                    status: "accepted"
+                    filled_quantity: "0.0"
+                    remaining_quantity: "0.5"
+                    average_price: null
+                    timestamp: "2025-01-24T12:34:56.789123Z"
+                    trades: []
+        '400':
+          description: Invalid request (validation error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingPrice:
+                  summary: Missing Price for Limit Order
+                  value:
+                    detail: "Price is required for limit orders"
+                invalidQuantity:
+                  summary: Invalid Quantity
+                  value:
+                    detail: "Quantity must be positive"
+                invalidOrderType:
+                  summary: Invalid Order Type
+                  value:
+                    detail: "Invalid order type. Must be: market, limit, ioc, fok"
+        '422':
+          description: Unprocessable entity (order rejected)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+              examples:
+                insufficientLiquidity:
+                  summary: Market Order Insufficient Liquidity
+                  value:
+                    order_id: "880h1733-h5ce-74h7-e150-h30hf4i23dh0"
+                    status: "rejected"
+                    filled_quantity: "0.0"
+                    remaining_quantity: "1.0"
+                    average_price: null
+                    timestamp: "2025-01-24T12:34:56.789123Z"
+                    error: "Insufficient liquidity for market order"
+                fokNotFillable:
+                  summary: FOK Order Not Fully Fillable
+                  value:
+                    order_id: "990i2844-i6df-85i8-f261-i41ig5j34ei1"
+                    status: "rejected"
+                    filled_quantity: "0.0"
+                    remaining_quantity: "5.0"
+                    average_price: null
+                    timestamp: "2025-01-24T12:34:56.789123Z"
+                    error: "FOK order cannot be fully filled"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/orderbook/{symbol}:
+    get:
+      tags:
+        - Market Data
+      summary: Get L2 order book
+      description: |
+        Retrieve aggregated order book showing price levels with total quantities.
+        Returns top price levels for bids (descending) and asks (ascending).
+        
+        **Performance:** ~237,000 queries/second, 6.7 μs p99 latency
+        
+      operationId: getOrderBook
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: Trading pair symbol (e.g., BTC-USDT, ETH-USDT)
+          schema:
+            type: string
+            example: "BTC-USDT"
+        - name: depth
+          in: query
+          required: false
+          description: Number of price levels to return (default 10)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+            example: 10
+      responses:
+        '200':
+          description: Order book retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderBookResponse'
+              examples:
+                btcUsdt:
+                  summary: BTC-USDT Order Book
+                  value:
+                    symbol: "BTC-USDT"
+                    timestamp: "2025-01-24T12:34:56.789123Z"
+                    bids:
+                      - ["50000.00", "1.5"]
+                      - ["49950.00", "2.0"]
+                      - ["49900.00", "0.5"]
+                    asks:
+                      - ["50100.00", "1.0"]
+                      - ["50150.00", "3.5"]
+                      - ["50200.00", "2.5"]
+        '404':
+          description: Symbol not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  summary: Symbol Not Found
+                  value:
+                    detail: "Order book not found for symbol: XYZ-USDT"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/bbo/{symbol}:
+    get:
+      tags:
+        - Market Data
+      summary: Get Best Bid and Offer (BBO)
+      description: |
+        Retrieve the best bid and ask prices with quantities for a trading pair.
+        Also includes spread calculation.
+        
+        **Performance:** ~237,000 queries/second, 6.7 μs p99 latency (O(1) operation)
+        
+      operationId: getBBO
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: Trading pair symbol (e.g., BTC-USDT, ETH-USDT)
+          schema:
+            type: string
+            example: "BTC-USDT"
+      responses:
+        '200':
+          description: BBO retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BboResponse'
+              examples:
+                withQuotes:
+                  summary: BBO with Quotes
+                  value:
+                    symbol: "BTC-USDT"
+                    timestamp: "2025-01-24T12:34:56.789123Z"
+                    best_bid: "50000.00"
+                    best_bid_qty: "1.5"
+                    best_ask: "50100.00"
+                    best_ask_qty: "1.0"
+                    spread: "100.00"
+                emptyBook:
+                  summary: Empty Order Book
+                  value:
+                    symbol: "BTC-USDT"
+                    timestamp: "2025-01-24T12:34:56.789123Z"
+                    best_bid: null
+                    best_bid_qty: null
+                    best_ask: null
+                    best_ask_qty: null
+                    spread: null
+        '404':
+          description: Symbol not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    OrderRequest:
+      type: object
+      required:
+        - symbol
+        - order_type
+        - side
+        - quantity
+      properties:
+        symbol:
+          type: string
+          description: Trading pair symbol
+          example: "BTC-USDT"
+          pattern: "^[A-Z]+-[A-Z]+$"
+        order_type:
+          type: string
+          description: Type of order
+          enum:
+            - market
+            - limit
+            - ioc
+            - fok
+          example: "limit"
+        side:
+          type: string
+          description: Buy or sell
+          enum:
+            - buy
+            - sell
+          example: "buy"
+        quantity:
+          type: string
+          description: Order quantity (use string for precision)
+          example: "0.5"
+          pattern: "^[0-9]+\\.?[0-9]*$"
+        price:
+          type: string
+          description: Limit price (required for limit orders, optional for others)
+          example: "50000.00"
+          pattern: "^[0-9]+\\.?[0-9]*$"
+          nullable: true
+        user_id:
+          type: string
+          description: Optional user identifier
+          example: "user123"
+          nullable: true
+        client_order_id:
+          type: string
+          description: Optional client-provided order ID
+          example: "my-order-001"
+          nullable: true
+
+    OrderResponse:
+      type: object
+      required:
+        - order_id
+        - status
+        - filled_quantity
+        - remaining_quantity
+        - timestamp
+        - trades
+      properties:
+        order_id:
+          type: string
+          format: uuid
+          description: Unique order identifier
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        status:
+          type: string
+          description: Order status
+          enum:
+            - pending
+            - accepted
+            - partially_filled
+            - filled
+            - canceled
+            - rejected
+          example: "filled"
+        filled_quantity:
+          type: string
+          description: Quantity filled
+          example: "0.5"
+        remaining_quantity:
+          type: string
+          description: Quantity remaining unfilled
+          example: "0.0"
+        average_price:
+          type: string
+          description: Volume-weighted average fill price
+          example: "50000.00"
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+          description: Order timestamp (microsecond precision)
+          example: "2025-01-24T12:34:56.789123Z"
+        trades:
+          type: array
+          description: List of trades executed
+          items:
+            $ref: '#/components/schemas/Trade'
+        error:
+          type: string
+          description: Error message (if rejected)
+          example: "Insufficient liquidity"
+          nullable: true
+
+    Trade:
+      type: object
+      required:
+        - trade_id
+        - price
+        - quantity
+        - aggressor_side
+      properties:
+        trade_id:
+          type: string
+          format: uuid
+          description: Unique trade identifier
+          example: "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+        price:
+          type: string
+          description: Execution price
+          example: "50000.00"
+        quantity:
+          type: string
+          description: Executed quantity
+          example: "0.5"
+        aggressor_side:
+          type: string
+          description: Side of the taker (aggressive) order
+          enum:
+            - buy
+            - sell
+          example: "buy"
+
+    OrderBookResponse:
+      type: object
+      required:
+        - symbol
+        - timestamp
+        - bids
+        - asks
+      properties:
+        symbol:
+          type: string
+          description: Trading pair symbol
+          example: "BTC-USDT"
+        timestamp:
+          type: string
+          format: date-time
+          description: Response timestamp
+          example: "2025-01-24T12:34:56.789123Z"
+        bids:
+          type: array
+          description: Bid price levels (descending order)
+          items:
+            type: array
+            minItems: 2
+            maxItems: 2
+            items:
+              type: string
+            example: ["50000.00", "1.5"]
+        asks:
+          type: array
+          description: Ask price levels (ascending order)
+          items:
+            type: array
+            minItems: 2
+            maxItems: 2
+            items:
+              type: string
+            example: ["50100.00", "1.0"]
+
+    BboResponse:
+      type: object
+      required:
+        - symbol
+        - timestamp
+      properties:
+        symbol:
+          type: string
+          description: Trading pair symbol
+          example: "BTC-USDT"
+        timestamp:
+          type: string
+          format: date-time
+          description: Response timestamp
+          example: "2025-01-24T12:34:56.789123Z"
+        best_bid:
+          type: string
+          description: Best bid price (highest)
+          example: "50000.00"
+          nullable: true
+        best_bid_qty:
+          type: string
+          description: Total quantity at best bid
+          example: "1.5"
+          nullable: true
+        best_ask:
+          type: string
+          description: Best ask price (lowest)
+          example: "50100.00"
+          nullable: true
+        best_ask_qty:
+          type: string
+          description: Total quantity at best ask
+          example: "1.0"
+          nullable: true
+        spread:
+          type: string
+          description: Difference between best ask and best bid
+          example: "100.00"
+          nullable: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: "Invalid order parameters"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        API key authentication (not currently implemented).
+        For production deployment, all requests should require authentication.
+
+# No security applied (development only)
+# In production, uncomment:
+# security:
+#   - ApiKeyAuth: []
