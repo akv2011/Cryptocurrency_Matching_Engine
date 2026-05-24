@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: crypto-matching-engine
+    env: docker
+    plan: free
+    healthCheckPath: /health

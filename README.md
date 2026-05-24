@@ -11,6 +11,53 @@ A production-grade cryptocurrency matching engine implementing REG NMS-inspired 
 
 See [TASKS.md](./TASKS.md) for complete checklist of requirements and progress tracking.
 
+## Deployment (Render free tier)
+
+The engine is deployed as a single Docker container on
+[Render](https://render.com) — one process, one port.
+
+### Architecture (single-port)
+
+| Endpoint | URL |
+|---|---|
+| REST API | `https://<host>/api/v1/...` |
+| Interactive docs | `https://<host>/docs` |
+| Health check | `https://<host>/health` |
+| Market Data (BBO + orderbook) | `wss://<host>/market-data` |
+| Trade Execution stream | `wss://<host>/trades` |
+
+All three transport layers run inside the same uvicorn process on the
+port supplied by Render's `PORT` environment variable (defaults to 8080
+locally).
+
+### Deploy to Render
+
+1. Push this repo to GitHub.
+2. In the [Render dashboard](https://dashboard.render.com) choose
+   **New > Web Service**, connect the repo, and select **Docker** as
+   the environment.
+3. Render auto-detects `render.yaml` and creates a free-tier web
+   service.  No additional environment variables are required.
+4. Once deployed, your live URLs will be:
+   - `https://<your-render-slug>.onrender.com/docs`
+   - `wss://<your-render-slug>.onrender.com/market-data`
+   - `wss://<your-render-slug>.onrender.com/trades`
+
+### Rebuild Docker locally
+
+```bash
+# Build image
+docker build -t crypto-matching-engine .
+
+# Run locally (same behaviour as Render)
+docker run -p 8080:8080 crypto-matching-engine
+
+# Or override the port
+docker run -e PORT=9000 -p 9000:9000 crypto-matching-engine
+```
+
+---
+
 ## 🎯 Project Goals
 
 Build a high-performance matching engine capable of:
