@@ -14,7 +14,7 @@ See [TASKS.md](./TASKS.md) for complete checklist of requirements and progress t
 ## Deployment (Render free tier)
 
 The engine is deployed as a single Docker container on
-[Render](https://render.com) — one process, one port.
+[Render](https://render.com), one process, one port.
 
 ### Architecture (single-port)
 
