@@ -1,15 +1,6 @@
 # High-Performance Cryptocurrency Matching Engine
 
-> **⚠️ CONFIDENTIAL**: This is a private GoQuant interview assignment. Do not share publicly.
-
 A production-grade cryptocurrency matching engine implementing REG NMS-inspired principles with strict price-time priority and internal order protection.
-
-## 📋 Assignment Status
-
-**Submission Deadline**: 7 days from October 14, 2025  
-**Current Status**: 🚧 In Development
-
-See [TASKS.md](./TASKS.md) for complete checklist of requirements and progress tracking.
 
 ## Deployment (Render free tier)
 
