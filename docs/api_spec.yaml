@@ -22,10 +22,9 @@ info:
     
   version: 1.0.0
   contact:
-    name: GoQuant Assignment
-    email: careers@goquant.io
+    name: Arunkumar V
   license:
-    name: Private (Confidential Assignment)
+    name: MIT
 
 servers:
   - url: http://localhost:8080/api/v1

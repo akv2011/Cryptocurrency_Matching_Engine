@@ -49,24 +49,24 @@ docker run -e PORT=9000 -p 9000:9000 crypto-matching-engine
 
 ---
 
-## 🎯 Project Goals
+## Project Goals
 
 Build a high-performance matching engine capable of:
 - Processing **>1000 orders/second**
 - **<1ms** order processing latency (p99)
-- **<100μs** BBO update latency (p99)  
+- **<100μs** BBO update latency (p99)
 - **<500μs** trade generation latency (p99)
 
 ### Core Features
-- ✅ REG NMS-inspired price-time priority matching
-- ✅ Internal order protection (no trade-throughs)
-- ✅ Multiple order types (Market, Limit, IOC, FOK)
-- ✅ REST API for order submission
-- ✅ WebSocket APIs for real-time market data and trades
-- ✅ Comprehensive logging and audit trails
-- ✅ High test coverage (>90%)
+- REG NMS-inspired price-time priority matching
+- Internal order protection (no trade-throughs)
+- Multiple order types (Market, Limit, IOC, FOK)
+- REST API for order submission
+- WebSocket APIs for real-time market data and trades
+- Comprehensive logging and audit trails
+- High test coverage (>90%)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.10+
@@ -114,14 +114,14 @@ pytest tests/ -v --cov=src --cov-report=html
 
 # Run specific test suites
 pytest tests/unit/ -v            # Unit tests
-pytest tests/integration/ -v     # Integration tests  
+pytest tests/integration/ -v     # Integration tests
 pytest tests/performance/ -v     # Performance benchmarks
 
 # View coverage report
 open htmlcov/index.html  # or start htmlcov/index.html on Windows
 ```
 
-## 📡 API Usage
+## API Usage
 
 ### REST API - Submit Orders
 
@@ -156,11 +156,11 @@ const ws = new WebSocket('ws://localhost:8080/market-data');
 
 ws.on('message', (data) => {
   const update = JSON.parse(data);
-  
+
   if (update.type === 'bbo') {
     console.log(`BBO Update: Bid ${update.best_bid} @ ${update.best_bid_qty}, Ask ${update.best_ask} @ ${update.best_ask_qty}`);
   }
-  
+
   if (update.type === 'orderbook') {
     console.log('Order Book Update:', update);
   }
@@ -179,7 +179,7 @@ ws.on('message', (data) => {
 });
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐
@@ -221,7 +221,7 @@ ws.on('message', (data) => {
 
 See [docs/architecture.md](./docs/architecture.md) for detailed architecture documentation.
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 Cryptocurrency_Matching_Engine/
@@ -237,7 +237,7 @@ Cryptocurrency_Matching_Engine/
 │   ├── utils/
 │   │   ├── logger.py             # Logging utilities
 │   │   └── metrics.py            # Performance metrics
-│   └── persistence/              # (Bonus) Persistence layer
+│   └── persistence/              # Persistence layer (planned)
 ├── tests/
 │   ├── unit/                     # Unit tests
 │   ├── integration/              # Integration tests
@@ -247,25 +247,18 @@ Cryptocurrency_Matching_Engine/
 │   ├── api_spec.yaml             # OpenAPI specification
 │   ├── algorithm.md              # Matching algorithm details
 │   └── performance.md            # Performance analysis
-├── .github/
-│   ├── copilot-instructions.md   # AI coding agent guidelines
-│   └── instructions/             # Development workflow instructions
-├── .taskmaster/                  # TaskMaster AI configuration
-├── TASKS.md                      # Assignment checklist
 ├── README.md                     # This file
 └── requirements.txt              # Python dependencies
 ```
 
-## 📚 Documentation
+## Documentation
 
-- **[TASKS.md](./TASKS.md)** - Complete assignment checklist with all requirements
-- **[.github/copilot-instructions.md](./.github/copilot-instructions.md)** - Guidelines for AI coding assistants
 - **[docs/architecture.md](./docs/architecture.md)** - System architecture and design decisions
 - **[docs/algorithm.md](./docs/algorithm.md)** - Detailed matching algorithm explanation
 - **[docs/api_spec.yaml](./docs/api_spec.yaml)** - OpenAPI specification
 - **[docs/performance.md](./docs/performance.md)** - Performance analysis and benchmarks
 
-## 🧪 Testing Strategy
+## Testing Strategy
 
 ### Unit Tests
 - Matching engine logic (all order types)
@@ -288,7 +281,7 @@ Cryptocurrency_Matching_Engine/
 
 Target: **>90% code coverage**
 
-## 📊 Performance Benchmarks
+## Performance Benchmarks
 
 ```bash
 # Run performance benchmarks
@@ -305,36 +298,15 @@ Expected results:
 - Trade generation: <500μs (p99)
 - Throughput: >1000 orders/second
 
-## 🎁 Bonus Features
+## Planned features
 
 - [ ] Advanced order types (Stop-Loss, Stop-Limit, Take-Profit)
 - [ ] Persistence layer with recovery
 - [ ] Detailed performance optimization
 - [ ] Maker-taker fee model
 
-See [TASKS.md](./TASKS.md) for complete bonus feature checklist.
 
-## 📧 Submission
-
-**Email to**: careers@goquant.io  
-**CC**: himanshu.vairagade@goquant.io  
-**Subject**: "Backend Assignment - REG NMS Matching Engine"
-
-**Include**:
-- Resume
-- Link to private GitHub repository
-- Video demonstration (private/unlisted)
-- Documentation
-
-## ⚠️ Confidentiality
-
-**CRITICAL REMINDER**:
-- ❌ Do NOT make repository public
-- ❌ Do NOT upload video publicly
-- ✅ Keep everything private
-- ✅ Share only with GoQuant team
-
-## 🛠️ Development Tools
+## Development Tools
 
 ### TaskMaster AI
 Project uses TaskMaster for AI-powered task management:
@@ -351,19 +323,8 @@ task-master update-task --id 1 --prompt "Completed feature X"
 ```
 
 ### VS Code Integration
-- Copilot configured with project-specific instructions
 - MCP server for TaskMaster integration
-- See `.github/copilot-instructions.md` for AI assistant guidelines
 
-## 📝 License
+## License
 
-This is a confidential interview assignment. All rights reserved.
-
-## 🤝 Contact
-
-For questions about this assignment, contact the GoQuant team at careers@goquant.io.
-
----
-
-**Last Updated**: October 15, 2025  
-**Status**: 🚧 In Development
+MIT, see [LICENSE](./LICENSE).

@@ -564,7 +564,7 @@ def broadcast_trade(trade: Trade):
 
 ### 2. In-Memory vs Persistent Storage
 
-**Decision:** In-Memory (with persistence as bonus feature)
+**Decision:** In-Memory (persistence planned)
 
 **Rationale:**
 - ✅ **Lowest Latency**: No disk I/O in critical path
@@ -574,7 +574,7 @@ def broadcast_trade(trade: Trade):
 - ❌ **Limited Capacity**: Constrained by RAM
 
 **Mitigation:**
-- Snapshots and transaction logs (bonus feature) for recovery
+- Snapshots and transaction logs (planned) for recovery
 - Horizontal scaling for capacity
 
 ### 3. Single Lock vs Lock-Free
@@ -757,7 +757,7 @@ def broadcast_trade(trade: Trade):
 ## Future Enhancements
 
 ### High Priority
-1. **Persistence Layer** (Bonus Feature)
+1. **Persistence Layer** (planned)
    - Snapshot order book state periodically
    - Transaction log for replay capability
    - Recovery from crashes
@@ -773,12 +773,12 @@ def broadcast_trade(trade: Trade):
    - Usage examples
 
 ### Medium Priority
-1. **Advanced Order Types** (Bonus Feature)
+1. **Advanced Order Types** (planned)
    - Stop-Loss orders
    - Stop-Limit orders
    - Take-Profit orders
 
-2. **Fee Structure** (Bonus Feature)
+2. **Fee Structure** (planned)
    - Maker-taker fee model
    - Fee calculation in trade reports
    - Per-user fee tracking
@@ -824,7 +824,7 @@ The Cryptocurrency Matching Engine demonstrates a **well-architected, high-perfo
 - **Performance**: ✅ Exceeds targets
 - **Testing**: ✅ Comprehensive coverage
 - **Monitoring**: ⚠️ Needs production-grade observability
-- **Persistence**: ❌ Bonus feature (optional)
+- **Persistence**: ❌ Planned
 
 The system is **ready for deployment** in environments requiring high-performance cryptocurrency order matching with REG NMS-inspired regulatory compliance.
 
@@ -832,4 +832,4 @@ The system is **ready for deployment** in environments requiring high-performanc
 
 **Document Version:** 1.0  
 **Last Updated:** 2025-01-24  
-**Author:** GoQuant Assignment Submission
+**Author:** Arunkumar V

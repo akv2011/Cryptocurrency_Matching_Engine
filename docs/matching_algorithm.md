@@ -532,7 +532,7 @@ def _can_fill_fok(self, order: FOKOrder, book: OrderBook) -> bool:
 
 **Scenario:** User's buy order matches their own sell order.
 
-**Current Implementation:** ❌ Not implemented (bonus feature)
+**Current Implementation:** ❌ Not implemented (planned)
 
 **Recommended Solution:**
 ```python

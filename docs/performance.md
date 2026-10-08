@@ -344,8 +344,8 @@ p99 Query Time: 6.7 μs  ← Target: <100 μs ✓
 | **Scalability** | ✅ Ready | Per-symbol sharding enables horizontal scaling |
 | **Maintainability** | ✅ Ready | Clean code, 86-92% test coverage, documented |
 | **Monitoring** | ⚠️ Partial | Metrics collection present, needs aggregation |
-| **Persistence** | ❌ Missing | In-memory only (bonus feature) |
-| **Disaster Recovery** | ❌ Missing | No snapshots or replay (bonus feature) |
+| **Persistence** | ❌ Missing | In-memory only (planned) |
+| **Disaster Recovery** | ❌ Missing | No snapshots or replay (planned) |
 
 **Overall:** ✅ **PRODUCTION READY** for core use cases
 
