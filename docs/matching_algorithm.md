@@ -29,10 +29,10 @@ This engine implements **Rule 611 (Order Protection)** principles adapted for cr
 
 | REG NMS Principle | Our Implementation |
 |-------------------|-------------------|
-| **No Trade-Throughs** | ✅ Incoming orders must match at best available prices first |
-| **Price-Time Priority** | ✅ Higher bids and lower offers prioritized; FIFO within price levels |
-| **Protected Quotations** | ✅ BBO updates broadcast in real-time (<100μs latency) |
-| **Fair Access** | ✅ All market participants see same orderbook state |
+| **No Trade-Throughs** | Yes Incoming orders must match at best available prices first |
+| **Price-Time Priority** | Yes Higher bids and lower offers prioritized; FIFO within price levels |
+| **Protected Quotations** | Yes BBO updates broadcast in real-time (<100μs latency) |
+| **Fair Access** | Yes All market participants see same orderbook state |
 
 **Differences from Traditional REG NMS:**
 - No inter-exchange routing (single matching engine)
@@ -289,8 +289,8 @@ Asks:
 
 Incoming Buy Market Order: 0.5 BTC
 
-❌ WRONG: Match at $50,200
-✅ CORRECT: Match at $50,100 (best price)
+WRONG: Match at $50,200
+CORRECT: Match at $50,100 (best price)
 ```
 
 **Impact:**
@@ -396,9 +396,9 @@ def _match_market_order(self, order: MarketOrder, book: OrderBook) -> List[Trade
 ```
 
 **Key Properties:**
-- ✅ No price limit (accepts any price)
-- ✅ Guaranteed fill if liquidity exists
-- ❌ No guaranteed price (market impact risk)
+- No price limit (accepts any price)
+- Guaranteed fill if liquidity exists
+- No guaranteed price (market impact risk)
 
 ### 2. Limit Orders
 
@@ -438,9 +438,9 @@ def _is_marketable(self, order: LimitOrder, book: OrderBook) -> bool:
 ```
 
 **Key Properties:**
-- ✅ Price protection (won't pay more/accept less than limit)
-- ✅ Rests on book if not immediately marketable
-- ✅ Can provide liquidity (maker orders)
+- Price protection (won't pay more/accept less than limit)
+- Rests on book if not immediately marketable
+- Can provide liquidity (maker orders)
 
 ### 3. IOC (Immediate-Or-Cancel)
 
@@ -460,9 +460,9 @@ def _match_ioc_order(self, order: IOCOrder, book: OrderBook) -> List[Trade]:
 ```
 
 **Key Properties:**
-- ✅ No resting on book (immediate execution only)
-- ✅ Accepts partial fills
-- ✅ Useful for minimizing market impact
+- No resting on book (immediate execution only)
+- Accepts partial fills
+- Useful for minimizing market impact
 
 ### 4. FOK (Fill-Or-Kill)
 
@@ -519,10 +519,10 @@ def _can_fill_fok(self, order: FOKOrder, book: OrderBook) -> bool:
 ```
 
 **Key Properties:**
-- ✅ All-or-nothing execution
-- ✅ No partial fills
-- ✅ Checks liquidity BEFORE execution
-- ❌ Lower fill rate (strict requirements)
+- All-or-nothing execution
+- No partial fills
+- Checks liquidity BEFORE execution
+- Lower fill rate (strict requirements)
 
 ---
 
@@ -532,7 +532,7 @@ def _can_fill_fok(self, order: FOKOrder, book: OrderBook) -> bool:
 
 **Scenario:** User's buy order matches their own sell order.
 
-**Current Implementation:** ❌ Not implemented (planned)
+**Current Implementation:** Not implemented (planned)
 
 **Recommended Solution:**
 ```python
@@ -547,7 +547,7 @@ def _can_match(self, taker_order: Order, maker_order: Order) -> bool:
 
 **Scenario:** Order has minimum fill quantity (e.g., "fill at least 0.5 BTC or reject").
 
-**Current Implementation:** ❌ Not implemented
+**Current Implementation:** Not implemented
 
 **Recommended Solution:**
 ```python
@@ -670,7 +670,7 @@ Pro-Rata Distribution:
 - Order C fills: 10 × (5/20) = 2.5 BTC
 ```
 
-**Our Choice:** ❌ Not used
+**Our Choice:** Not used
 
 **Rationale:**
 - Pro-rata favors large orders (disproportionate to time priority)
@@ -688,7 +688,7 @@ Price Level $50,000:
 - Order B: 1.0 BTC @ 10:01  ← Matches first (larger)
 ```
 
-**Our Choice:** ❌ Not used
+**Our Choice:** Not used
 
 **Rationale:**
 - Favors institutional players over retail
@@ -700,14 +700,14 @@ Price Level $50,000:
 **How It Works:** First come, first served at each price.
 
 **Advantages:**
-- ✅ Simple and fair
-- ✅ REG NMS compliant
-- ✅ Encourages liquidity provision (time priority reward)
-- ✅ Predictable execution
+- Simple and fair
+- REG NMS compliant
+- Encourages liquidity provision (time priority reward)
+- Predictable execution
 
 **Disadvantages:**
-- ❌ Can disadvantage slow market makers
-- ❌ Vulnerable to latency arbitrage
+- Can disadvantage slow market makers
+- Vulnerable to latency arbitrage
 
 ---
 
@@ -822,12 +822,12 @@ def test_complex_matching_scenario():
 
 The matching algorithm successfully implements **REG NMS-inspired principles** with:
 
-✅ **Strict price-time priority** enforcement  
-✅ **Trade-through prevention** (no execution at worse prices)  
-✅ **FIFO fairness** at each price level  
-✅ **Support for all order types** (Market, Limit, IOC, FOK)  
-✅ **High performance** (6,641 orders/sec, 0.406ms p99 latency)  
-✅ **Comprehensive testing** (27 matching engine tests, 100% passing)
+**Strict price-time priority** enforcement  
+**Trade-through prevention** (no execution at worse prices)  
+**FIFO fairness** at each price level  
+**Support for all order types** (Market, Limit, IOC, FOK)  
+**High performance** (6,641 orders/sec, 0.406ms p99 latency)  
+**Comprehensive testing** (27 matching engine tests, 100% passing)
 
 The algorithm provides **fair, efficient, and predictable** order execution suitable for cryptocurrency trading while maintaining compatibility with traditional financial market principles.
 

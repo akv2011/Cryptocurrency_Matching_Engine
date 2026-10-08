@@ -103,21 +103,21 @@ class PriceLevel:
 #### Why Deque?
 ```python
 # Alternative 1: List
-# ❌ popleft() is O(n) - expensive for FIFO
+# popleft() is O(n) - expensive for FIFO
 orders: List[Order] = []
 first_order = orders.pop(0)  # O(n) - shifts all elements
 
 # Alternative 2: Deque
-# ✅ popleft() is O(1) - efficient for FIFO
+# popleft() is O(1) - efficient for FIFO
 orders: Deque[Order] = deque()
 first_order = orders.popleft()  # O(1) - constant time
 ```
 
 **Deque Advantages:**
-- ✅ O(1) append (add order)
-- ✅ O(1) popleft (remove filled order)
-- ✅ O(1) access to first element (peek at next order)
-- ❌ O(n) remove by value (for cancellations)
+- O(1) append (add order)
+- O(1) popleft (remove filled order)
+- O(1) access to first element (peek at next order)
+- O(n) remove by value (for cancellations)
 
 **Mitigation for O(n) Removal:**
 - Cancellations are less frequent than fills
@@ -135,9 +135,9 @@ def get_total_quantity() -> Decimal:
 ```
 
 **Benefits:**
-- ✅ O(1) L2 orderbook depth calculation
-- ✅ Fast liquidity checks for FOK orders
-- ✅ Efficient market depth queries
+- O(1) L2 orderbook depth calculation
+- Fast liquidity checks for FOK orders
+- Efficient market depth queries
 
 ### Complexity Analysis
 
@@ -278,10 +278,10 @@ class OrderBook:
 
 | Data Structure | Pros | Cons | Verdict |
 |----------------|------|------|---------|
-| **Heap (heapq)** | O(1) min/max access | ❌ Can't efficiently remove arbitrary elements<br>❌ No ordered iteration | ❌ Rejected |
-| **Dict + Manual Sort** | Simple | ❌ O(n log n) to sort each time<br>❌ Expensive for frequent updates | ❌ Rejected |
-| **Balanced Tree (Red-Black)** | O(log n) operations | ❌ Complex implementation<br>❌ Python stdlib doesn't provide | ❌ Rejected |
-| **SortedDict (sortedcontainers)** | ✅ O(log n) insert/delete<br>✅ O(1) min/max<br>✅ Ordered iteration<br>✅ Battle-tested library | Requires external dependency | ✅ **Chosen** |
+| **Heap (heapq)** | O(1) min/max access | No Can't efficiently remove arbitrary elements<br>No No ordered iteration | No Rejected |
+| **Dict + Manual Sort** | Simple | No O(n log n) to sort each time<br>No Expensive for frequent updates | No Rejected |
+| **Balanced Tree (Red-Black)** | O(log n) operations | No Complex implementation<br>No Python stdlib doesn't provide | No Rejected |
+| **SortedDict (sortedcontainers)** | Yes O(log n) insert/delete<br>Yes O(1) min/max<br>Yes Ordered iteration<br>Yes Battle-tested library | Requires external dependency | Yes **Chosen** |
 
 **SortedDict Implementation Details:**
 ```python
@@ -299,12 +299,12 @@ from sortedcontainers import SortedDict
 
 ```python
 # Alternative: Single sorted structure
-# ❌ Complex to maintain two-sided sorting (bids desc, asks asc)
+# Complex to maintain two-sided sorting (bids desc, asks asc)
 combined = SortedDict()  # How to sort bids high→low AND asks low→high?
 
 # Chosen: Separate structures
-# ✅ Bids naturally sorted ascending, iterate in reverse
-# ✅ Asks naturally sorted ascending, iterate forward
+# Bids naturally sorted ascending, iterate in reverse
+# Asks naturally sorted ascending, iterate forward
 bids = SortedDict()  # $50000, $49950, $49900, ... (iterate reversed)
 asks = SortedDict()  # $50100, $50150, $50200, ... (iterate forward)
 ```
@@ -339,8 +339,8 @@ self.orders: Dict[str, Order] = {}
 ```
 
 **Trade-off:**
-- ✅ Instant order access
-- ❌ Additional memory (store orders twice: in price levels + dict)
+- Instant order access
+- Additional memory (store orders twice: in price levels + dict)
 - **Verdict:** Worth the memory for O(1) cancellations
 
 ### Complexity Analysis
@@ -446,23 +446,23 @@ class Order:
 ```
 
 **Advantages:**
-- ✅ Reduces boilerplate by ~70%
-- ✅ Auto-generates `__init__`, `__repr__`, `__eq__`, `__hash__`
-- ✅ Type hints built-in
-- ✅ Immutability option with `frozen=True`
+- Reduces boilerplate by ~70%
+- Auto-generates `__init__`, `__repr__`, `__eq__`, `__hash__`
+- Type hints built-in
+- Immutability option with `frozen=True`
 
 #### Why Decimal Instead of Float?
 
 ```python
 # Floating-Point Error Example:
 >>> 0.1 + 0.2 == 0.3
-False  # ❌ Rounding error!
+False  # Rounding error!
 >>> 0.1 + 0.2
 0.30000000000000004
 
 # Decimal Precision:
 >>> Decimal("0.1") + Decimal("0.2") == Decimal("0.3")
-True  # ✅ Exact arithmetic
+True  # Exact arithmetic
 ```
 
 **Financial Implications:**
@@ -475,30 +475,30 @@ True  # ✅ Exact arithmetic
 ```
 
 **Trade-offs:**
-- ✅ Exact precision (critical for financial applications)
-- ✅ No accumulating errors
-- ❌ ~10-100x slower than floats
-- ❌ Higher memory usage (20 bytes vs 8 bytes)
+- Exact precision (critical for financial applications)
+- No accumulating errors
+- ~10-100x slower than floats
+- Higher memory usage (20 bytes vs 8 bytes)
 
-**Verdict:** ✅ Use Decimal (correctness > speed)
+**Verdict:** Use Decimal (correctness > speed)
 
 #### Why Enum for Side and Status?
 
 ```python
 # Without Enum (string constants):
-order.side = "buy"  # ❌ Typos: "Buy", "BUY", "b", "by"
-order.status = "prtially_filled"  # ❌ Typo undetected
+order.side = "buy"  # Typos: "Buy", "BUY", "b", "by"
+order.status = "prtially_filled"  # Typo undetected
 
 # With Enum:
-order.side = OrderSide.BUY  # ✅ Type-safe
-order.status = OrderStatus.PARTIALLY_FILLED  # ✅ Autocomplete
+order.side = OrderSide.BUY  # Type-safe
+order.status = OrderStatus.PARTIALLY_FILLED  # Autocomplete
 ```
 
 **Advantages:**
-- ✅ Type safety (catch errors at development time)
-- ✅ IDE autocomplete
-- ✅ No typos in string constants
-- ✅ Clear valid values
+- Type safety (catch errors at development time)
+- IDE autocomplete
+- No typos in string constants
+- Clear valid values
 
 ### Complexity Analysis
 
@@ -604,10 +604,10 @@ Components:
 
 | Metric | Achieved | Target | Status |
 |--------|----------|--------|--------|
-| **Order Submission** | 6,641 orders/sec | >1,000 | ✅ 6.6x |
-| **p99 Latency** | 0.406 ms | <1.0 ms | ✅ 2.5x |
-| **BBO Queries** | 237,042 queries/sec | >10,000 | ✅ 23x |
-| **Memory per Order** | ~240 bytes | <1 KB | ✅ 4x |
+| **Order Submission** | 6,641 orders/sec | >1,000 | Yes 6.6x |
+| **p99 Latency** | 0.406 ms | <1.0 ms | Yes 2.5x |
+| **BBO Queries** | 237,042 queries/sec | >10,000 | Yes 23x |
+| **Memory per Order** | ~240 bytes | <1 KB | Yes 4x |
 
 ### Bottleneck Analysis
 
@@ -643,11 +643,11 @@ Components:
 - O(log n) insertion
 
 **Cons:**
-- ❌ Can't iterate in order efficiently
-- ❌ Can't remove arbitrary elements efficiently
-- ❌ Complex to maintain two heaps (bid/ask)
+- Can't iterate in order efficiently
+- Can't remove arbitrary elements efficiently
+- Complex to maintain two heaps (bid/ask)
 
-**Verdict:** ❌ Rejected (insufficient functionality)
+**Verdict:** Rejected (insufficient functionality)
 
 ### 2. Linked List for Price Levels
 
@@ -656,11 +656,11 @@ Components:
 - Simple implementation
 
 **Cons:**
-- ❌ O(n) to find price level
-- ❌ No random access
-- ❌ Poor cache locality
+- O(n) to find price level
+- No random access
+- Poor cache locality
 
-**Verdict:** ❌ Rejected (slow price lookups)
+**Verdict:** Rejected (slow price lookups)
 
 ### 3. Skip List
 
@@ -670,25 +670,25 @@ Components:
 - Good cache locality
 
 **Cons:**
-- ❌ Probabilistic (not deterministic)
-- ❌ No mature Python library
-- ❌ Would need custom implementation
+- Probabilistic (not deterministic)
+- No mature Python library
+- Would need custom implementation
 
-**Verdict:** ❌ Rejected (not worth custom implementation)
+**Verdict:** Rejected (not worth custom implementation)
 
 ### 4. B-Tree (SortedDict Implementation)
 
 **Pros:**
-- ✅ O(log n) operations
-- ✅ Excellent cache locality
-- ✅ Ordered iteration
-- ✅ Proven performance
+- O(log n) operations
+- Excellent cache locality
+- Ordered iteration
+- Proven performance
 
 **Cons:**
 - More complex than BST
 - External dependency
 
-**Verdict:** ✅ **Chosen** (best balance of performance and features)
+**Verdict:** **Chosen** (best balance of performance and features)
 
 ---
 
@@ -714,7 +714,7 @@ assert price_level.orders[1] == order2
 assert price_level.orders[2] == order3  # Back of queue
 ```
 
-**Verified:** ✅ 27 unit tests in `test_order_book.py`
+**Verified:** 27 unit tests in `test_order_book.py`
 
 ### 2. Price Priority
 
@@ -738,7 +738,7 @@ for price in reversed(bids.keys()):
 # 49900
 ```
 
-**Verified:** ✅ 27 unit tests in `test_matching_engine.py`
+**Verified:** 27 unit tests in `test_matching_engine.py`
 
 ### 3. No Trade-Throughs
 
@@ -754,7 +754,7 @@ for price in reversed(self.bids.keys()):  # Descending order
         # Match all orders at this price (FIFO)
 ```
 
-**Verified:** ✅ Test case `test_trade_through_prevention` passes
+**Verified:** Test case `test_trade_through_prevention` passes
 
 ---
 
@@ -816,22 +816,22 @@ total = np.sum(quantities)  # Vectorized (faster)
 
 The data structures design achieves **optimal performance** through:
 
-✅ **Efficient Core Structures:**
+**Efficient Core Structures:**
 - SortedDict for O(log n) price level operations
 - Deque for O(1) FIFO queue operations
 - Dict for O(1) order lookup
 
-✅ **Correctness Guarantees:**
+**Correctness Guarantees:**
 - Price priority (SortedDict ordering)
 - Time priority (Deque FIFO)
 - Trade-through prevention (iteration order)
 
-✅ **Proven Performance:**
+**Proven Performance:**
 - 6,641 orders/second (6.6x target)
 - 0.406 ms p99 latency (2.5x better than target)
 - 237,042 BBO queries/second (23x target)
 
-✅ **Scalability:**
+**Scalability:**
 - Sub-linear growth (O(log n) operations)
 - Memory-efficient (~240 bytes per order)
 - Supports 1000+ price levels efficiently

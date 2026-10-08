@@ -77,7 +77,7 @@ def benchmark_order_throughput(num_orders=10000):
     print(f"Total time:        {total_time:.2f} seconds")
     print(f"Throughput:        {throughput:,.2f} orders/second")
     print(f"Target:            1,000 orders/second")
-    print(f"Status:            {'✓ PASS' if throughput >= 1000 else '✗ FAIL'}")
+    print(f"Status:            {'OK PASS' if throughput >= 1000 else 'ERROR FAIL'}")
     print(f"\nLatency Statistics:")
     print(f"  Mean:            {mean(latencies):.3f} ms")
     print(f"  Median (p50):    {median(latencies):.3f} ms")
@@ -86,7 +86,7 @@ def benchmark_order_throughput(num_orders=10000):
     print(f"  Min:             {min(latencies):.3f} ms")
     print(f"  Max:             {max(latencies):.3f} ms")
     print(f"\nTarget Latency:    <1.0 ms (p99)")
-    print(f"Status:            {'✓ PASS' if p99 < 1.0 else '✗ FAIL'}")
+    print(f"Status:            {'OK PASS' if p99 < 1.0 else 'ERROR FAIL'}")
     print(f"{'='*60}\n")
     
     return throughput, p99
@@ -190,7 +190,7 @@ def benchmark_bbo_updates():
     print(f"Mean Latency:      {mean(latencies):.2f} μs")
     print(f"p99 Latency:       {p99:.2f} μs")
     print(f"Target:            <100 μs")
-    print(f"Status:            {'✓ PASS' if p99 < 100 else '✗ FAIL'}")
+    print(f"Status:            {'OK PASS' if p99 < 100 else 'ERROR FAIL'}")
     print(f"{'='*60}\n")
 
 
@@ -208,10 +208,10 @@ if __name__ == "__main__":
     print("\n" + "="*60)
     print("SUMMARY")
     print("="*60)
-    print(f"✓ Order Throughput:    {throughput:,.2f} orders/second (target: >1,000)")
-    print(f"✓ Order Latency (p99): {p99_latency:.3f} ms (target: <1.0 ms)")
-    print(f"✓ All core components tested and verified")
-    print(f"✓ 88 unit tests passing (86-92% coverage on core)")
-    print(f"✓ 4 integration tests passing")
+    print(f"OK Order Throughput:    {throughput:,.2f} orders/second (target: >1,000)")
+    print(f"OK Order Latency (p99): {p99_latency:.3f} ms (target: <1.0 ms)")
+    print(f"OK All core components tested and verified")
+    print(f"OK 88 unit tests passing (86-92% coverage on core)")
+    print(f"OK 4 integration tests passing")
     print("="*60)
-    print("\n✅ Matching Engine is PRODUCTION READY!\n")
+    print("\nOK Matching Engine is PRODUCTION READY!\n")
